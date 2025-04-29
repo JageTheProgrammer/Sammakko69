@@ -20,16 +20,6 @@ youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
 def ping():
     return jsonify({"status": "ok"}), 200
 
-@app.route('/debug', methods=['GET'])
-def debug_yt():
-    try:
-        video_url = "https://www.youtube.com/watch?v=1fOBgosDo7s"  # Avicii Levels
-        ydl_opts = {'quiet': False, 'skip_download': True}
-        with ytdl.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(video_url, download=False)
-        return jsonify({"success": True, "title": info.get("title")})
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)})
 
 
 @app.route('/search', methods=['GET'])
