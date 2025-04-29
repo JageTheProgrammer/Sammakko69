@@ -2,8 +2,10 @@ import os
 import yt_dlp as ytdl
 from flask import Flask, jsonify, request
 from googleapiclient.discovery import build
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes and origins
 
 # Your YouTube API key (replace with your actual key)
 YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
