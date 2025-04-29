@@ -31,26 +31,45 @@ def search_music():
         return jsonify({"error": "Query parameter is required"}), 400
 
     try:
-        # Call the YouTube API to search for the query
+        # YouTube search
         search_response = youtube.search().list(
             part='snippet',
             q=query,
             type='video',
-            maxResults=5
+            maxResults=10
         ).execute()
 
         results = []
         for item in search_response.get('items', []):
-            results.append({
-                'id': item['id'],
-                'snippet': item['snippet']
-            })
+            video_id = item['id']['videoId']
+            video_url = f'https://www.youtube.com/watch?v={video_id}'
+
+            try:
+                # Test if yt-dlp can extract info
+                ydl_opts = {
+                    'format': 'bestaudio/best',
+                    'quiet': True,
+                    'skip_download': True
+                }
+                with ytdl.YoutubeDL(ydl_opts) as ydl:
+                    info = ydl.extract_info(video_url, download=False)
+
+                # If successful, include this video
+                results.append({
+                    'id': item['id'],
+                    'snippet': item['snippet']
+                })
+
+            except Exception as e:
+                print(f"Skipping {video_id} due to extract error: {e}")
+                continue  # Skip unplayable videos
 
         return jsonify(results)
 
     except Exception as e:
         print(f"Error during search: {e}")
-        return jsonify({"error": "Failed to fetch data from YouTube"}), 500
+        return jsonify({"error": "Failed to fetch or filter data from YouTube"}), 500
+
 
 
 @app.route('/play', methods=['GET'])
