@@ -3,6 +3,7 @@ import yt_dlp as ytdl
 from flask import Flask, jsonify, request
 from googleapiclient.discovery import build
 from flask_cors import CORS
+import requests
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes and origins
@@ -13,6 +14,15 @@ YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
 
 # Initialize YouTube API client
 youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
+
+@app.route('/ping', methods=['GET'])
+def ping_google():
+    try:
+        response = requests.get('https://www.google.com', timeout=5)
+        return jsonify({"status": "online", "code": response.status_code})
+    except Exception as e:
+        print(f"Ping failed: {e}")
+        return jsonify({"status": "offline", "error": str(e)}), 500
 
 @app.route('/search', methods=['GET'])
 def search_music():
