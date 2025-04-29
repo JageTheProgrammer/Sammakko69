@@ -50,34 +50,6 @@ def play_music():
         return jsonify({"error": "Video ID is required"}), 400
 
     try:
-        # Use yt-dlp to extract the audio URL from the video
-        video_url = f'https://www.youtube.com/watch?v={video_id}'
-        ydl_opts = {
-            'format': 'bestaudio/best',  # Get best audio quality
-            'extractaudio': True,  # Only extract audio
-            'audioquality': 1,  # Best quality audio
-            'outtmpl': '/tmp/%(id)s.%(ext)s',  # Temporary file path
-            'quiet': True,  # Suppress output
-        }
-
-        with ytdl.YoutubeDL(ydl_opts) as ydl:
-            # Extract info and get the URL for the audio stream
-            info_dict = ydl.extract_info(video_url, download=False)
-            audio_url = info_dict.get("formats", [])[0].get("url")
-
-        return jsonify({
-            'url': audio_url  # Return the direct audio stream URL
-        })
-
-    except Exception as e:
-        print(f"Error during play: {e}")
-        return jsonify({"error": "Failed to extract audio from YouTube video"}), 500@app.route('/play', methods=['GET'])
-def play_music():
-    video_id = request.args.get('videoId')
-    if not video_id:
-        return jsonify({"error": "Video ID is required"}), 400
-
-    try:
         video_url = f'https://www.youtube.com/watch?v={video_id}'
         ydl_opts = {
             'format': 'bestaudio/best',
@@ -87,7 +59,8 @@ def play_music():
 
         with ytdl.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(video_url, download=False)
-            # Find best audio format with a URL
+
+            # Find audio-only format
             formats = info_dict.get("formats", [])
             audio_url = None
             for fmt in formats:
@@ -96,12 +69,15 @@ def play_music():
                     break
 
             if not audio_url:
-                return jsonify({"error": "No audio format found"}), 500
+                return jsonify({"error": "No audio stream found"}), 404
 
         return jsonify({'url': audio_url})
 
+    except ytdl.utils.DownloadError as e:
+        print(f"DownloadError during play: {e}")
+        return jsonify({"error": "YouTube video is unavailable or restricted."}), 403
     except Exception as e:
-        print(f"Error during play: {e}")
+        print(f"General error during play: {e}")
         return jsonify({"error": "Failed to extract audio from YouTube video"}), 500
 
 
