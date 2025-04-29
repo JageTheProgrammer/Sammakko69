@@ -71,7 +71,39 @@ def play_music():
 
     except Exception as e:
         print(f"Error during play: {e}")
+        return jsonify({"error": "Failed to extract audio from YouTube video"}), 500@app.route('/play', methods=['GET'])
+def play_music():
+    video_id = request.args.get('videoId')
+    if not video_id:
+        return jsonify({"error": "Video ID is required"}), 400
+
+    try:
+        video_url = f'https://www.youtube.com/watch?v={video_id}'
+        ydl_opts = {
+            'format': 'bestaudio/best',
+            'quiet': True,
+            'skip_download': True,
+        }
+
+        with ytdl.YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(video_url, download=False)
+            # Find best audio format with a URL
+            formats = info_dict.get("formats", [])
+            audio_url = None
+            for fmt in formats:
+                if fmt.get('acodec') != 'none' and fmt.get('vcodec') == 'none':
+                    audio_url = fmt.get('url')
+                    break
+
+            if not audio_url:
+                return jsonify({"error": "No audio format found"}), 500
+
+        return jsonify({'url': audio_url})
+
+    except Exception as e:
+        print(f"Error during play: {e}")
         return jsonify({"error": "Failed to extract audio from YouTube video"}), 500
+
 
 
 if __name__ == '__main__':
