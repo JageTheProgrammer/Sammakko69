@@ -6,7 +6,8 @@ from googleapiclient.discovery import build
 app = Flask(__name__)
 
 # Your YouTube API key (replace with your actual key)
-YOUTUBE_API_KEY = 'YOUR_YOUTUBE_API_KEY'
+YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
+
 
 # Initialize YouTube API client
 youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
