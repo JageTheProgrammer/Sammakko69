@@ -36,7 +36,7 @@ def search_music():
             part='snippet',
             q=query,
             type='video',
-            maxResults=10
+            maxResults=5
         ).execute()
 
         results = []
