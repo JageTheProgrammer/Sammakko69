@@ -112,6 +112,17 @@ def play_music():
         print(f"Playback error: {e}")
         return jsonify({"error": "Failed to extract audio from YouTube video."}), 500
 
+@app.route('/debug', methods=['GET'])
+def debug_yt():
+    try:
+        video_url = "https://www.youtube.com/watch?v=1fOBgosDo7s"
+        ydl_opts = {'quiet': False, 'skip_download': True}
+        with ytdl.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(video_url, download=False)
+        return jsonify({"success": True, "title": info.get("title")})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
