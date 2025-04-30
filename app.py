@@ -15,14 +15,13 @@ if not YOUTUBE_API_KEY:
 # Initialize YouTube API client
 youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
 
-
-# Ensure yt-dlp uses local ffmpeg
+# Ensure yt-dlp uses local ffmpeg (if needed)
 os.environ["PATH"] += os.pathsep + os.getcwd()
+
 
 @app.route('/ping', methods=['GET'])
 def ping():
     return jsonify({"status": "ok"}), 200
-
 
 
 @app.route('/search', methods=['GET'])
@@ -115,6 +114,7 @@ def play_music():
         print(f"Playback error: {e}")
         return jsonify({"error": "Failed to extract audio from YouTube video."}), 500
 
+
 @app.route('/debug', methods=['GET'])
 def debug_yt():
     try:
@@ -127,7 +127,5 @@ def debug_yt():
         return jsonify({"success": False, "error": str(e)})
 
 
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
-
