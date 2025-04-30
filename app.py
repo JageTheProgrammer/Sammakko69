@@ -5,18 +5,19 @@ from googleapiclient.discovery import build
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # Allow all origins (adjust if needed)
+CORS(app)
 
-# Load API key from environment variable
 YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
 if not YOUTUBE_API_KEY:
-    raise EnvironmentError("YOUTUBE_API_KEY is not set. Please add it in Render's environment variables.")
+    raise EnvironmentError("YOUTUBE_API_KEY is not set in the environment.")
 
-# Initialize YouTube API client
 youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
-
-# Ensure yt-dlp uses local ffmpeg (if needed)
 os.environ["PATH"] += os.pathsep + os.getcwd()
+
+
+@app.route('/')
+def index():
+    return jsonify({"message": "YouTube Audio API is running."})
 
 
 @app.route('/ping', methods=['GET'])
@@ -54,7 +55,6 @@ def search_music():
                 with ytdl.YoutubeDL(ydl_opts) as ydl:
                     ydl.extract_info(video_url, download=False)
 
-                # Include only if yt-dlp succeeded
                 results.append({
                     'id': item['id'],
                     'snippet': item['snippet']
@@ -64,7 +64,7 @@ def search_music():
                     break
 
             except Exception as e:
-                print(f"Skipping {video_id} due to extract error: {e}")
+                print(f"Skipping {video_id}: {e}")
                 continue
 
         if not results:
@@ -126,6 +126,3 @@ def debug_yt():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
 
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
