@@ -16,6 +16,9 @@ if not YOUTUBE_API_KEY:
 youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
 
 
+# Ensure yt-dlp uses local ffmpeg
+os.environ["PATH"] += os.pathsep + os.getcwd()
+
 @app.route('/ping', methods=['GET'])
 def ping():
     return jsonify({"status": "ok"}), 200
