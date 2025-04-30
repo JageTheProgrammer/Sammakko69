@@ -118,7 +118,7 @@ def play_music():
 @app.route('/debug', methods=['GET'])
 def debug_yt():
     try:
-        video_url = "https://www.youtube.com/watch?v=1fOBgosDo7s"
+       video_url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         ydl_opts = {'quiet': False, 'skip_download': True}
         with ytdl.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(video_url, download=False)
