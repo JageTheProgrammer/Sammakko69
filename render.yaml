@@ -1,11 +1,9 @@
 services:
   - type: web
-    name: yt-api-backend
+    name: youtube-audio-api
     env: python
-    buildCommand: |
-      bash render-build.sh && pip install -r requirements.txt
-    startCommand: |
-      PATH=$PATH:$(pwd) python app.py
+    buildCommand: ""
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
     envVars:
       - key: YOUTUBE_API_KEY
-        value: AIzaSyDHLtCi8bhQ1IiY-SkkaxLXifB4LoUCuLI
+        sync: true
